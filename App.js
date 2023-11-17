@@ -4,7 +4,7 @@ export default function App() {
   const [items, setItems] = useState([]);
 
   function AddGroceryItems(item) {
-    setItems((item) => [...items, item]);
+    setItems((items) => [...items, item]);
   }
 
   function ToggleGroceryItems(id) {
