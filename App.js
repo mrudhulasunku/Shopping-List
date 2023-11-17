@@ -1,126 +1,123 @@
 import { useState } from "react";
 
-// const itemsList = [
-//   {
-//     item: "dal",
-//     weight: "1kg",
-//   },
-//   {
-//     item: "jeera",
-//     weight: "500grams",
-//   },
-// ];
-
 export default function App() {
   const [items, setItems] = useState([]);
 
-  function handleClearAll() {
-    setItems([]);
+  function AddGroceryItems(item) {
+    setItems((item) => [...items, item]);
   }
 
-  function handleToggleItem(id) {
+  function ToggleGroceryItems(id) {
     setItems((items) =>
       items.map((item) =>
         item.id === id ? { ...item, packed: !item.packed } : item
       )
     );
   }
-
-  function handleAddItems(item) {
-    setItems((items) => [...items, item]);
-  }
   return (
     <div>
-      <Header />
-      <Form onAddItem={handleAddItems} />
-
-      <ItemList items={items} onToggleItem={handleToggleItem} />
-
-      <Sorted onClearAll={handleClearAll} items={items} />
+      <GroceryHeader />
+      <GroceryForm onAddGroceryItems={AddGroceryItems} />
+      <GroceryList items={items} onToggleGroceryItems={ToggleGroceryItems} />
+      <GrocerySort />
     </div>
   );
 }
 
-function Header() {
-  return <h3>Grocery Shopping List</h3>;
+function GroceryHeader() {
+  return (
+    <div>
+      <h1>Grocery List</h1>
+    </div>
+  );
 }
 
-function Form({ onAddItem }) {
-  const [name, setName] = useState("");
+function GroceryForm({ onAddGroceryItems }) {
+  const [itemName, setItemName] = useState("");
   const [weight, setWeight] = useState("");
-
+  const [quantity, setQuantity] = useState("quantity");
   function handleSubmit(e) {
     e.preventDefault();
-    if (!name) return;
-    const newItem = { name, weight, packed: false, id: Date.now() };
-    onAddItem(newItem);
-    setName("");
+    if (!itemName) return;
+    const newItem = {
+      itemName,
+      weight,
+      quantity,
+      packed: false,
+      id: performance.now(),
+    };
+    onAddGroceryItems(newItem);
+    setItemName("");
     setWeight("");
+    setQuantity("quantity");
   }
   return (
     <form onSubmit={handleSubmit}>
-      <span>Item name : </span>
+      <label>Item: </label>
       <input
         type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={itemName}
+        onChange={(e) => setItemName(e.target.value)}
       />
-      <span>Weight : </span>
+
+      <label>Weight : </label>
       <input
         type="text"
         value={weight}
         onChange={(e) => setWeight(e.target.value)}
       />
+      <select value={quantity} onChange={(e) => setQuantity(e.target.value)}>
+        <option value="quantity">Quantity</option>
+        <option value="grams">Grams</option>
+        <option value="kilogram">Kilo-gram</option>
+      </select>
       <button>Add</button>
     </form>
   );
 }
-function ItemList({ items, onToggleItem }) {
+
+function GroceryList({ items, onToggleGroceryItems }) {
   return (
-    <div>
-      <ul>
-        {items.map((item) => (
-          <Item item={item} key={item.id} onToggleItem={onToggleItem} />
-        ))}
-      </ul>
-    </div>
+    <ul>
+      {items.map((item) => (
+        <GroceryItemList
+          item={item}
+          key={item.id}
+          onToggleGroceryItems={onToggleGroceryItems}
+        />
+      ))}
+    </ul>
   );
 }
 
-function Item({ item, onToggleItem }) {
+function GroceryItemList({ item, onToggleGroceryItems, key }) {
   return (
-    <li>
+    <li key={item.id}>
       <input
         type="checkbox"
         value={item.packed}
-        onChange={() => onToggleItem(item.id)}
+        onChange={() => onToggleGroceryItems(item.id)}
       />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.name} : {item.weight}
+        {item.itemName}
+        {item.weight}
+        {item.quantity}
       </span>
-      <span></span>
+      <button style={{ color: "red" }}>X</button>
     </li>
   );
 }
 
-function Sorted({ onClearAll, items }) {
-  const [sortBy, setSortBy] = useState("unpacked");
-  let sortedItems;
-  if (sortBy === "unpacked") {
-    sortedItems = items;
-  }
-  if (sortBy === "packed") {
-    sortedItems = items
-      .slice()
-      .sort((a, b) => Number(a.packed) - Number(b.packed));
-  }
+function GrocerySort() {
   return (
     <div>
       <select>
-        <option value="packed">Packed</option>
-        <option value="unpacked">UnPacked</option>
+        <option>Sort By</option>
+        {/* Sorts according to alphabetic order */}
+        <option>Sort By Input</option>
+        {/* Sorts according to packed */}
+        <option>Sort By Packing</option>
       </select>
-      <button onClick={onClearAll}>Clear All</button>
     </div>
   );
 }
